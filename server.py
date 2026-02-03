@@ -23,9 +23,17 @@ from pydantic import BaseModel
 app = FastAPI(title="MemoWeave API")
 
 # CORS Configuration
+allowed_origins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    os.getenv("FRONTEND_URL", "")  # Add your Railway frontend URL here
+]
+# Filter out empty strings
+allowed_origins = [origin for origin in allowed_origins if origin]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -320,4 +328,5 @@ if __name__ == "__main__":
     
     # Start the server
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8000))  # Railway sets PORT env variable
+    uvicorn.run(app, host="0.0.0.0", port=port)

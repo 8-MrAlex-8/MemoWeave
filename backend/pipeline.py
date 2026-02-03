@@ -238,42 +238,6 @@ def run_pipeline(
             step_errors.append(error_msg)
             raise
         print()
-
-        # Step 6: Temporal-Causal Reasoning
-        #print("=" * 60)
-        print("STEP 6: Temporal-Causal Reasoning")
-        #print("=" * 60)
-        #print(f"[{datetime.now().strftime('%H:%M:%S')}] Starting Step 6...")
-        try:
-            # Import here to avoid circular dependencies if any
-            # Import here to avoid circular dependencies if any
-            try:
-                from .step6_reasoning import process_reasoning
-            except ImportError:
-                # If running as script/improper module context, fallback
-                from backend.step6_reasoning import process_reasoning
-            
-            reasoning_result = process_reasoning(output_dir, output_dir)
-            
-            if reasoning_result.get("status") == "success":
-                print()
-                print(f"[{datetime.now().strftime('%H:%M:%S')}] OK: Step 6 completed successfully")
-                data = reasoning_result.get("data", {})
-                temp_rels = len(data.get("temporal_relations", []))
-                causal_rels = len(data.get("causal_relations", []))
-                print(f"  - Inferred {temp_rels} temporal relations")
-                print(f"  - Inferred {causal_rels} causal relations")
-            else:
-                print()
-                print(f"[{datetime.now().strftime('%H:%M:%S')}] WARN: Step 6 failed or skipped")
-                print(f"  - Error: {reasoning_result.get('error')}")
-                
-        except Exception as e:
-            error_msg = f"Step 6 (Reasoning) failed: {str(e)}"
-            #print(f"[{datetime.now().strftime('%H:%M:%S')}] WARN: {error_msg}")
-            print("  - Continuing (Step 6 is optional/experimental)")
-            traceback.print_exc()
-        print()
         
         # Final output path
         final_output_path = os.path.join(output_dir, "memory", "memory_module.json")
