@@ -12,13 +12,15 @@ transformers>=4.0.0
 sentence-transformers>=2.2.0
 spacy>=3.0.0
 
+
 # Dependencies for Models/Utilities
 scikit-learn
 pandas
-numpy
+numpy<2
 tqdm
 requests
 huggingface_hub
+pdfminer.six
 
 # Optional/Legacy (Keep if code relies on them)
 # allennlp==2.9.3 # Warning: AllenNLP can be huge and cause conflicts. Uncomment only if strictly needed.
