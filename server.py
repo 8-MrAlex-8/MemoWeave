@@ -26,7 +26,7 @@ app = FastAPI(title="MemoWeave API")
 allowed_origins = [
     "http://localhost:3000",
     "http://localhost:3001",
-    os.getenv("FRONTEND_URL", "")  # Add your Railway frontend URL here
+    "https://memoweave.vercel.app"  
 ]
 # Filter out empty strings
 allowed_origins = [origin for origin in allowed_origins if origin]
