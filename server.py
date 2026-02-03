@@ -13,6 +13,8 @@ import subprocess
 from typing import Optional, Generator
 from pathlib import Path
 
+from backend.model_cache import get_model_status
+
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -271,6 +273,51 @@ async def analyze_stream(filename: str = Query(...), rule: str = Query(...), for
 
     return StreamingResponse(analysis_generator(), media_type="text/event-stream")
 
+
+def ensure_models():
+    """
+    Check if required models are available and download if missing.
+    This runs before server startup to ensure all models are ready.
+    """
+    print("\n" + "="*60)
+    print("MemoWeave - Checking AI Models")
+    print("="*60)
+    
+    status = get_model_status()
+    missing = [name for name, available in status.items() if not available]
+    
+    if missing:
+        print(f"⚠️  Missing models detected: {', '.join(missing)}")
+        print("📥 Downloading models... This may take a few minutes.")
+        print("")
+        
+        # Run download_models.py
+        try:
+            result = subprocess.run(
+                [sys.executable, "download_models.py"],
+                cwd=Path(__file__).parent,
+                check=False
+            )
+            
+            if result.returncode != 0:
+                print("\n❌ Model download failed. Some features may not work properly.")
+                print("   You can manually run: python download_models.py")
+            else:
+                print("\n✅ All models downloaded successfully!")
+        except Exception as e:
+            print(f"\n❌ Error during model download: {e}")
+            print("   You can manually run: python download_models.py")
+    else:
+        print("✅ All required models are available")
+    
+    print("="*60)
+    print("")
+
+
 if __name__ == "__main__":
+    # Check and download models if needed
+    ensure_models()
+    
+    # Start the server
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
