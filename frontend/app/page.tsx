@@ -283,8 +283,8 @@ export default function Home() {
     };
   }, []);
 
-  return (
-    <div className="min-h-screen bg-[#F6F3FA] p-4 sm:p-5 font-['Segoe_UI']">
+ return (
+    <div className="min-h-screen bg-[#F6F3FA] p-4 sm:p-5 font-sans">
       <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-4 sm:gap-5 min-h-[550px]">
         {/* Left Panel */}
         <div className="flex-[3] flex flex-col gap-4 sm:gap-5">
@@ -430,9 +430,9 @@ export default function Home() {
           </Card>
 
           <Card title="Memo Weave System Progress" tint="#EFEFEF">
-            <div className="p-3 min-h-[180px] max-h-[28dvh] overflow-y-auto border border-[#E0DAF0] bg-white rounded-md text-sm leading-relaxed text-[#2D2640] whitespace-pre-wrap break-words font-mono text-xs">
+            <div className="p-3 min-h-[180px] max-h-[28dvh] overflow-y-auto border border-[#E0DAF0] bg-white rounded-md text-sm leading-relaxed text-[#2D2640] whitespace-pre-wrap break-words text-xs">
               {progressOutput || (
-                <span className="text-[#9A90B8] font-sans">
+                <span className="text-[#9A90B8]">
                   System logs will appear here during analysis...
                 </span>
               )}

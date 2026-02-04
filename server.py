@@ -250,20 +250,35 @@ async def analyze_stream(filename: str = Query(...), rule: str = Query(...), for
                 
                 current_analysis_process = process
                 
-                # Stream output line by line
-                while True:
-                    line = process.stdout.readline()
-                    if line:
+                # Stream output line by line using a queue to avoid blocking heartbeats
+                output_queue = queue.Queue()
+
+                def enqueue_output(out, q):
+                    for line in iter(out.readline, ''):
+                        q.put(line)
+                    out.close()
+
+                out_thread = threading.Thread(target=enqueue_output, args=(process.stdout, output_queue))
+                out_thread.daemon = True
+                out_thread.start()
+
+                last_heartbeat = time.time()
+                while process.poll() is None or not output_queue.empty():
+                    try:
+                        # Non-blocking get with short timeout
+                        line = output_queue.get(timeout=1.0)
                         if is_useful_log(line):
                             msg = send_log(line)
                             if msg:
                                 yield msg
-                    elif process.poll() is not None:
-                        break
-                    else:
-                        # keep SSE alive
-                        yield ": keep-alive\n\n"
-                        time.sleep(0.2)
+                        last_heartbeat = time.time() # Reset on actual data
+                    except queue.Empty:
+                        # Check if it's time for a heartbeat (every 30 seconds)
+                        if time.time() - last_heartbeat > 30:
+                            yield ": keep-alive\n\n"
+                            last_heartbeat = time.time()
+                
+                out_thread.join(timeout=1)
                 
                 current_analysis_process = None
 
