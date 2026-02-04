@@ -7,7 +7,7 @@ python-multipart
 # ML / NLP Libraries
 # Use CPU-only PyTorch to save space (approx 2GB savings)
 --extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.2.2+cpu
+#torch==2.2.2+cpu
 transformers>=4.0.0
 sentence-transformers>=2.2.0
 spacy>=3.0.0
