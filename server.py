@@ -53,6 +53,29 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 pipeline_lock = threading.Lock()
 current_analysis_process: Optional[subprocess.Popen] = None
 
+@app.get("/")
+def root():
+    """
+    Root endpoint - API information and status
+    """
+    return {
+        "name": "MemoWeave API",
+        "version": "1.0.0",
+        "status": "online",
+        "description": "Backend API for MemoWeave - Temporal Memory Layer",
+        "endpoints": {
+            "health": "/health - Health check endpoint",
+            "upload": "POST /upload - Upload a text file for analysis",
+            "files": "GET /files - List uploaded files",
+            "file_content": "GET /files/{filename}/content - Get file content",
+            "delete_file": "DELETE /files/{filename} - Delete a file",
+            "analyze": "GET /analyze_stream - Run analysis pipeline (streaming)",
+            "reset": "POST /reset - Reset session and clear files"
+        },
+        "frontend_url": "https://memoweave.vercel.app",
+        "docs": "/docs - Interactive API documentation"
+    }
+
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
