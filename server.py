@@ -26,7 +26,7 @@ app = FastAPI(title="MemoWeave API")
 allowed_origins = [
     "http://localhost:3000",
     "http://localhost:3001",
-    "https://memoweave.vercel.app"  
+    "https://memo-weave.vercel.app"  # Corrected: added hyphen
 ]
 # Filter out empty strings
 allowed_origins = [origin for origin in allowed_origins if origin]
@@ -72,7 +72,7 @@ def root():
             "analyze": "GET /analyze_stream - Run analysis pipeline (streaming)",
             "reset": "POST /reset - Reset session and clear files"
         },
-        "frontend_url": "https://memoweave.vercel.app",
+        "frontend_url": "https://memo-weave.vercel.app",
         "docs": "/docs - Interactive API documentation"
     }
 
