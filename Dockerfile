@@ -27,12 +27,9 @@ RUN pip install --upgrade pip && \
 # Copy the rest of the application
 COPY . .
 
-# Make the startup script executable
-RUN chmod +x start.sh
-
 # Expose the port the app runs on
 EXPOSE 8000
 
 # Command to run the application
-# Use startup script for proper environment variable handling
-CMD ["./start.sh"]
+# Use Python startup script for proper environment variable handling
+CMD ["python", "start.py"]
