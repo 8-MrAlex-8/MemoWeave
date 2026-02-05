@@ -23,17 +23,16 @@ from pydantic import BaseModel
 app = FastAPI(title="MemoWeave API")
 
 # CORS Configuration
+# Allow localhost for development and Vercel deployments (production + previews)
 allowed_origins = [
     "http://localhost:3000",
     "http://localhost:3001",
-    "https://memo-weave.vercel.app"  # Corrected: added hyphen
 ]
-# Filter out empty strings
-allowed_origins = [origin for origin in allowed_origins if origin]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",  # Allow all Vercel deployments (production + previews)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
