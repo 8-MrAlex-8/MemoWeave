@@ -14,7 +14,7 @@ load_dotenv()
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-MODEL_NAME = "gpt-oss-120b:free"
+MODEL_NAME = "gpt-oss-120b"
 
 def log(msg: str, callback: Callable = None):
     formatted = msg
