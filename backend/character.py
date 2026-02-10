@@ -123,34 +123,22 @@ def call_reasoning_llm(prompt: str, use_reasoning: bool = False) -> str:
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
     }
-    
-    system_content = (
-        "You are a macro-level story consistency validator.\n"
-        "Detect which missing characters/actors, tools, or roles exist in the story.\n"
-        "Some actors could be locations.\n"
-        "Summarize issues per chapter in human-readable paragraphs.\n"
-        "For each violation, guide the user by explicitly mentioning the particular sentence/s you found the violation in.\n"
-        "Do NOT reference event IDs or sentence IDs.\n"
-        "Do NOT rewrite the story, only report violations."
-    )
-    
-    # Enhanced system message when using reasoning graph
-    if use_reasoning:
-        system_content += (
-            "\n\nYou have been provided with:\n"
-            "- Temporal relationships using Allen's Interval Algebra (BEFORE, AFTER, OVERLAPS, etc.)\n"
-            "- Causal relationships (CAUSES, ENABLES)\n\n"
-            "Use these to detect:\n"
-            "1. Timeline contradictions (events out of logical temporal order)\n"
-            "2. Causal impossibilities (effects occurring before causes)\n"
-            "3. Location/character tracking errors (impossible transitions)\n"
-            "4. Narrative coherence breaks"
-        )
 
     payload = {
         "model": MODEL_NAME,
         "messages": [
-            {"role": "system", "content": system_content},
+            {
+                "role": "system",
+                "content": (
+                    "You are a macro-level story consistency validator.\n"
+                    "Detect which missing characters/actors, tools, or roles exist in the story.\n"
+                    "Some actors could be locations.\n"
+                    "Summarize issues per chapter in human-readable paragraphs.\n"
+                    "For each violation, guide the user by explicitly mentioning the particular sentence/s you found the violation in.\n"
+                    "Do NOT reference event IDs or sentence IDs.\n"
+                    "Do NOT rewrite the story, only report violations."
+                )
+            },
             {"role": "user", "content": prompt}
         ],
         "temperature": 0.0
