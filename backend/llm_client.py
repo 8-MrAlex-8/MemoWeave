@@ -1,83 +1,58 @@
 
 import os
 import json
-import time
+import requests
 from typing import Dict, Any, Optional
 
 try:
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
-    pass # python-dotenv not installed, relying on system env vars
+    pass
+
+# =========================
+# Configuration (matches character.py)
+# =========================
+
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+MODEL_NAME = "gpt-oss-120b"
+
 
 def call_reasoning_model(system_prompt: str, user_prompt: str) -> str:
     """
-    Call the LLM for reasoning tasks.
-    
-    This is a placeholder implementation. In a real scenario, you would 
-    integrate with an API like OpenAI, Anthropic, or Google Gemini here.
-    
-    For now, it checks if an environment variable 'MOCK_LLM_RESPONSE' is set.
-    If so, it returns that. Otherwise, it prints the prompt and asks for manual input
-    or returns a dummy JSON if 'AUTO_MOCK' is true.
+    Call the LLM for reasoning tasks via OpenRouter API.
+    Uses the same model and endpoint as character.py.
     """
-    
-    # -------------------------------------------------------------------------
-    # GOOGLE GEMINI IMPLEMENTATION
-    # Make sure to run: pip install google-generativeai
-    # -------------------------------------------------------------------------
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if api_key:
-        try:
-            import google.generativeai as genai
-            genai.configure(api_key=api_key)
-            # Confirmed working model from user's environment
-            model = genai.GenerativeModel('gemini-1.5-flash') 
-            
-            # Combine system and user prompt as Gemini 1.0/1.5 handles them often in the generate call or chat history
-            # For simplicity in a single call:
-            formatted_prompt = f"{system_prompt}\n\n{user_prompt}"
-            
-            response = model.generate_content(formatted_prompt)
-            return response.text
-        except ImportError:
-            print("[LLM Client] Error: google-generativeai package not found. Run 'pip install google-generativeai'")
-        except Exception as e:
-            print(f"[LLM Client] Google AI Call Failed: {e}")
-            import traceback
-            traceback.print_exc()
 
-    # -------------------------------------------------------------------------
-    # OPENAI IMPLEMENTATION (Example)
-    # -------------------------------------------------------------------------
-    # openai_key = os.getenv("OPENAI_API_KEY")
-    # if openai_key:
-    #     ...
-    # -------------------------------------------------------------------------
-
-    print(f"\n[LLM Client] Simulating call to reasoning model...")
-    print(f"[LLM Client] System Prompt length: {len(system_prompt)}")
-    print(f"[LLM Client] User Prompt length: {len(user_prompt)}")
-    
-    # Check for debug/testing override
-    if os.environ.get("AUTO_MOCK") == "true":
-        print("[LLM Client] Returning AUTO_MOCK response.")
+    if not OPENROUTER_API_KEY:
+        print("[LLM Client] WARNING: OPENROUTER_API_KEY not set.")
+        print("[LLM Client] Returning empty reasoning graph.")
         return json.dumps({
-            "temporal_relations": [
-                {"from_event": "ev1", "to_event": "ev2", "relation": "BEFORE"}
-            ],
-            "causal_relations": [
-                {"from_event": "ev1", "to_event": "ev2", "relation": "CAUSES"}
-            ]
+            "temporal_relations": [],
+            "causal_relations": []
         }, indent=2)
 
-    # If no API and no Mock, we can't do much. 
-    # For this exercise, we'll return an empty valid JSON structure 
-    # so the pipeline doesn't crash, but warn the user.
-    print("[LLM Client] WARNING: No LLM API configured. returning empty graph.")
-    return """
-    {
-        "temporal_relations": [],
-        "causal_relations": []
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json",
     }
-    """
+
+    payload = {
+        "model": MODEL_NAME,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "temperature": 0.0
+    }
+
+    try:
+        print(f"[LLM Client] Calling OpenRouter ({MODEL_NAME})...")
+        response = requests.post(OPENROUTER_URL, headers=headers, json=payload)
+        response.raise_for_status()
+        data = response.json()
+        return data["choices"][0]["message"]["content"]
+    except requests.exceptions.RequestException as e:
+        print(f"[LLM Client] OpenRouter request failed: {e}")
+        raise
