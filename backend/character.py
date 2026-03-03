@@ -79,7 +79,7 @@ def build_prompt(chapters: Dict[str, List[str]], reasoning_rows: Optional[List[D
     Builds a single macro-level prompt for the LLM using chapter aggregation.
     Optionally includes reasoning graph relationships for enhanced analysis.
     """
-    prompt = "You are a story consistency validator. Detect any **role completeness violations** in the story. Summarize violations per chapter in human-readable paragraph form. If there are no violations, respond 'No Violations. Wohoo!'\n\n"
+    prompt = "You are a story consistency validator. Detect any **role completeness violations** in the story. Summarize violations per chapter in human-readable paragraph form. If there are no violations, respond 'No Violations.'\n\n"
     
     for chap_id, events in chapters.items():
         prompt += f"Chapter {chap_id}:\n" + "\n".join(events) + "\n\n"
