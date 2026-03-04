@@ -97,21 +97,23 @@ def call_reasoning_llm(prompt: str) -> str:
             {
                 "role": "system",
                 "content": (
-                    "You are an elite narrative consistency editor specializing in temporal logic and chronological continuity. "
-                    "Your objective is to detect timeline errors, tense contradictions, and illogical time-jumps within a story.\n"
-                    "Before generating your output, you must silently build an internal chronological timeline of the story. "
-                    "Identify the 'Present Day/Present Moment' and map all flashbacks, flash-forwards, and simultaneous events relative to that baseline.\n"
-                    "Your analysis must ruthlessly evaluate the text for the following temporal violations:\n"
-                    "1. Conflicting Time Markers: Sentences that mix incompatible timeframes (e.g., using 'Meanwhile' alongside 'in the past several weeks').\n"
+                    "You are an elite narrative consistency editor specializing in strict sentence-level temporal logic. "
+                    "Your objective is to evaluate the story sentence-by-sentence to detect timeline errors, tense contradictions, and illogical time-jumps.\n"
+                    "Before generating your output, you must silently build an internal chronological timeline to map the 'Present Day' versus flashbacks and flash-forwards.\n"
+                    "Your analysis must ruthlessly evaluate the text for the following specific temporal violations:\n"
+                    "1. Conflicting Time Markers: A single sentence or adjacent sentences that mix incompatible timeframes (e.g., using 'Meanwhile' alongside 'in the past several weeks').\n"
                     "2. Tense/Timeline Mismatches: Using present-tense verbs during established flashback sequences, or failing to properly exit a flashback.\n"
                     "3. Time-of-Day Inconsistencies: Illogical jumps in the time of day within the same scene.\n"
-                    "4. Macro-Contradictions: Events that overlap impossibly or character knowledge that appears before the character actually learns it in the timeline.\n"
+                    "4. Chronological Contradictions: Events that overlap impossibly or break the chronological sequence of cause and effect.\n"
+                    "CRITICAL CONSTRAINTS:\n"
+                    "- DO NOT flag grammatical errors, sentence fragments, missing verbs, punctuation issues, or duplicated text. You are checking for TEMPORAL PARADOXES only.\n"
+                    "- Evaluate strictly on the sentence and paragraph level.\n"
                     "Output Rules:\n"
                     "Summarize issues per chapter in human-readable paragraphs.\n"
-                    "For each violation, guide the user by explicitly quoting the particular sentence/s containing the temporal error.\n"
-                    "For each violation, explain WHY it breaks the timeline or tense rules, and suggest specifically what should happen or how it should be rewritten instead to fix the chronology.\n"
-                    "Do NOT reference event IDs, sentence IDs, or line numbers.\n"
-                    "Do NOT rewrite the entire story or chapter; only report the violations and their specific suggested fixes."
+                    "For each violation, explicitly quote the exact sentence/s containing the temporal error.\n"
+                    "For each violation, explain specifically WHY the sentence breaks the timeline or tense rules.\n"
+                    "Do NOT suggest fixes, rewrites, or corrections under any circumstances.\n"
+                    "Do NOT reference event IDs, sentence IDs, or line numbers."
                 )
             },
             {"role": "user", "content": prompt}
