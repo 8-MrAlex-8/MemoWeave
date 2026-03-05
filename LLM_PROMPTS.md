@@ -6,38 +6,41 @@ This document explains where to find and modify the LLM prompts used for generat
 
 MemoWeave uses LLM (Large Language Model) feedback to detect story consistency violations. There are two types of feedback, each with its own prompt configuration:
 
-1. **Temporal Consistency** - Detects timing contradictions and event ordering issues
+1. **Temporal Consistency** - Detects timing contradictions, verb tense mismatches, deictic marker misuse, spatial-temporal contradictions, and event ordering issues
 2. **Role Completeness** - Detects missing characters, actors, or tools in events
 
-Both use OpenRouter API with the `gpt-oss-120b:free` model by default.
+Both use OpenRouter API with the `gpt-oss-120b` model by default.
 
 ## Prompt Locations
 
 ### 1. Temporal Consistency Feedback
 
-**File:** [`backend/events.py`](file:///c:/Users/Gilbert/MemoWeave/backend/events.py)
+**File:** [`backend/events.py`](file:///c:/Users/wobin/Documents/GitHub/MemoWeave/backend/events.py)
 
-**Function:** `call_reasoning_llm()` (lines 59-90)
+**Function:** `call_reasoning_llm()` — Contains the system prompt with 9 violation categories
 
-**System Prompt** (lines 70-77):
-```python
-"You are a macro-level story consistency validator.\n"
-"Know the whole context first, in case of flashback sequences"
-"Detect temporal contradictions or overlapping events.\n"
-"Summarize issues per chapter in human-readable paragraphs.\n"
-"Do NOT reference event IDs or sentence IDs.\n"
-"Do NOT rewrite the story, only report violations."
-```
+**System Prompt Violation Categories:**
+1. Contradictory time signals for the same event (definite vs indefinite)
+2. Spatial-temporal contradictions (character in two places at the "same present")
+3. Verb tense violations in flashback/present transitions
+4. Deictic marker misuse ("Now", "the present") contradicting established timeline
+5. Contradictory "present" anchors across paragraphs
+6. Adverb-timeframe incompatibility ("Meanwhile" + past durations)
+7. Duration contradictions for the same information
+8. Time-of-day semantic precision (evening vs night)
+9. Cross-chapter timeline continuity
 
-**User Prompt Builder:** `build_prompt()` (lines 48-57)
-- Aggregates events by chapter from the temporal_consistency.csv
+**User Prompt Builder:** `build_prompt()` 
+- Includes the **full raw story text** for verb tense and deictic marker analysis
+- Aggregates extracted events by chapter from the temporal_consistency.csv
 - Formats: `"Chapter {id}: - {event_text} (time: {time}, type: {type})"`
 
 **To Fine-tune:**
-- Modify the system prompt content in lines 71-76 to change LLM behavior
+- Modify the violation categories in the system prompt to change what the LLM looks for
 - Adjust the user prompt format in `build_prompt()` to change data presentation
 - Change `MODEL_NAME` (line 17) to use a different model
-- Adjust `temperature` (line 81) for more/less creative responses (currently 0.0)
+- Adjust `temperature` for more/less creative responses (currently 0.0)
+
 
 ---
 
