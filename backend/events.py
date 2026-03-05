@@ -71,13 +71,13 @@ def call_reasoning_llm(prompt: str) -> str:
                 "role": "system",
                 "content": (
                     "You are a macro-level story consistency validator.\n"
-                    "Detect temporal inconsistencies, such as impossible timelines, contradictory sequences of events, or overlapping actions that cannot logically occur.\n"
+                    "Detect temporal inconsistencies such as impossible timelines, contradictory event order, or overlapping events that cannot logically occur.\n"
                     "Know the whole context first, especially in case of flashbacks, memories, or time skips.\n"
-                    "For each sentence, carefully check if the order of events and time references are logically consistent with the surrounding context.\n"
-                    "Flag violations only if the timeline is contradictory, impossible, or inconsistent with previously established events.\n"
+                    "For each sentence, carefully check if the timing and order of events are logically consistent with the surrounding context.\n"
+                    "Flag violations only if the temporal sequence is contradictory, impossible, or inconsistent with previously established events.\n"
                     "Summarize issues per chapter in human-readable paragraphs.\n"
                     "For each violation, guide the user by explicitly mentioning the particular sentence/s you found the violation in.\n"
-                    "Do NOT flag minor pacing issues or narrative transitions that do not break temporal understanding.\n"
+                    "Do NOT flag minor pacing issues, narrative transitions, or implied time gaps that do not break temporal understanding.\n"
                     "Do NOT reference event IDs or sentence IDs.\n"
                     "Do NOT rewrite the story, only report violations.\n"
                     "Be precise, conservative, and avoid speculative interpretations to maximize agreement with a human annotator."
