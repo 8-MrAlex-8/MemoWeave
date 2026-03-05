@@ -51,28 +51,11 @@ def build_prompt(chapters: Dict[str, List[str]]) -> str:
     """
     Builds a single macro-level prompt for the LLM using chapter aggregation.
     """
-    prompt = (
-        "Analyze the following story events for **temporal inconsistencies**.\n"
-        "For each chapter, carefully read the events in order and check whether the timeline makes logical sense.\n"
-        "Look for:\n"
-        "- Events that happen BEFORE something that should have preceded them\n"
-        "- Actions described as occurring simultaneously that cannot logically overlap\n"
-        "- Time references that contradict the established sequence\n"
-        "- Characters doing things at times that conflict with where the narrative places them\n\n"
-        "Report ALL violations you find. For each violation, quote the exact event text and explain the inconsistency.\n\n"
-        "Here are the story events organized by chapter:\n\n"
-    )
-
+    prompt = "You are a story consistency validator. Detect any **temporal consistency violations** in the story. Summarize violations per chapter in human-readable paragraph form.\n\n"
+    
     for chap_id, events in chapters.items():
-        prompt += f"=== Chapter {chap_id} ===\n" + "\n".join(events) + "\n\n"
-
-    prompt += (
-        "Now analyze the events above step by step. For each chapter, check the temporal ordering of events "
-        "and report any inconsistencies you find. Format your response as:\n\n"
-        "**Chapter [id]:**\n"
-        "[Describe each violation found, quoting the exact event text]\n"
-    )
-
+        prompt += f"Chapter {chap_id}:\n" + "\n".join(events) + "\n\n"
+    
     return prompt
 
 def call_reasoning_llm(prompt: str) -> str:
@@ -87,31 +70,22 @@ def call_reasoning_llm(prompt: str) -> str:
             {
                 "role": "system",
                 "content": (
-                    "You are a rigorous story consistency validator specialized in detecting temporal violations.\n"
-                    "Your job is to find ALL temporal inconsistencies in the story events provided.\n\n"
-                    "WHAT TO LOOK FOR:\n"
-                    "- Events happening out of logical chronological order\n"
-                    "- Time references that contradict each other (e.g., morning vs. night for the same scene)\n"
-                    "- Actions that are impossible given the established timeline\n"
-                    "- Overlapping events that cannot logically co-occur\n"
-                    "- Sequences where a result appears before its cause\n\n"
-                    "HOW TO ANALYZE:\n"
-                    "1. First, read ALL events across ALL chapters to understand the full timeline.\n"
-                    "2. Account for intentional flashbacks, memories, or time skips — these are NOT violations.\n"
-                    "3. Then go chapter by chapter, event by event, and check temporal consistency.\n"
-                    "4. Compare each event against its neighbors and against the broader timeline.\n\n"
-                    "HOW TO REPORT:\n"
-                    "- For each violation, quote the exact event text where the problem occurs.\n"
-                    "- Explain WHY it is a temporal inconsistency.\n"
-                    "- Organize findings by chapter in human-readable paragraphs.\n"
-                    "- Do NOT reference event IDs or sentence IDs.\n"
-                    "- Do NOT rewrite the story.\n"
-                    "- If after thorough analysis you genuinely find no violations, state that clearly."
+                    "You are a macro-level story consistency validator.\n"
+                    "Detect temporal inconsistencies, such as impossible timelines, contradictory sequences of events, or overlapping actions that cannot logically occur.\n"
+                    "Know the whole context first, especially in case of flashbacks, memories, or time skips.\n"
+                    "For each sentence, carefully check if the order of events and time references are logically consistent with the surrounding context.\n"
+                    "Flag violations only if the timeline is contradictory, impossible, or inconsistent with previously established events.\n"
+                    "Summarize issues per chapter in human-readable paragraphs.\n"
+                    "For each violation, guide the user by explicitly mentioning the particular sentence/s you found the violation in.\n"
+                    "Do NOT flag minor pacing issues or narrative transitions that do not break temporal understanding.\n"
+                    "Do NOT reference event IDs or sentence IDs.\n"
+                    "Do NOT rewrite the story, only report violations.\n"
+                    "Be precise, conservative, and avoid speculative interpretations to maximize agreement with a human annotator."
                 )
             },
             {"role": "user", "content": prompt}
         ],
-        "temperature": 0.3
+        "temperature": 0.0
     }
 
     try:
