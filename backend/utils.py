@@ -70,7 +70,7 @@ def read_text_file(filepath: str) -> str:
 
     if ext == ".txt":
         try:
-            with open(filepath, "r", encoding="utf-8") as f:
+            with open(filepath, "r", encoding="utf-8-sig") as f:
                 return f.read()
         except UnicodeDecodeError:
             with open(filepath, "r", encoding="latin-1") as f:
